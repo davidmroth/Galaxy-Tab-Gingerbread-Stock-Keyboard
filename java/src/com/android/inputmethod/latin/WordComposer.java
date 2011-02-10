@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2009 Google Inc.
+ * Copyright (C) 2008 The Android Open Source Project
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -17,7 +17,6 @@
 package com.android.inputmethod.latin;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * A place to store the currently composing word with information such as adjacent key codes as well
@@ -26,27 +25,36 @@ public class WordComposer {
     /**
      * The list of unicode values for each keystroke (including surrounding keys)
      */
-    private ArrayList<int[]> mCodes;
+    private final ArrayList<int[]> mCodes;
     
     /**
      * The word chosen from the candidate list, until it is committed.
      */
     private String mPreferredWord;
     
-    private StringBuilder mTypedWord;
+    private final StringBuilder mTypedWord;
 
     private int mCapsCount;
 
     private boolean mAutoCapitalized;
     
     /**
-     * Whether the user chose to capitalize the word.
+     * Whether the user chose to capitalize the first char of the word.
      */
-    private boolean mIsCapitalized;
+    private boolean mIsFirstCharCapitalized;
 
-    WordComposer() {
+    public WordComposer() {
         mCodes = new ArrayList<int[]>(12);
         mTypedWord = new StringBuilder(20);
+    }
+
+    WordComposer(WordComposer copy) {
+        mCodes = new ArrayList<int[]>(copy.mCodes);
+        mPreferredWord = copy.mPreferredWord;
+        mTypedWord = new StringBuilder(copy.mTypedWord);
+        mCapsCount = copy.mCapsCount;
+        mAutoCapitalized = copy.mAutoCapitalized;
+        mIsFirstCharCapitalized = copy.mIsFirstCharCapitalized;
     }
 
     /**
@@ -54,7 +62,7 @@ public class WordComposer {
      */
     public void reset() {
         mCodes.clear();
-        mIsCapitalized = false;
+        mIsFirstCharCapitalized = false;
         mPreferredWord = null;
         mTypedWord.setLength(0);
         mCapsCount = 0;
@@ -108,11 +116,14 @@ public class WordComposer {
      * Delete the last keystroke as a result of hitting backspace.
      */
     public void deleteLast() {
-        mCodes.remove(mCodes.size() - 1);
-        final int lastPos = mTypedWord.length() - 1;
-        char last = mTypedWord.charAt(lastPos);
-        mTypedWord.deleteCharAt(lastPos);
-        if (Character.isUpperCase(last)) mCapsCount--;
+        final int codesSize = mCodes.size();
+        if (codesSize > 0) {
+            mCodes.remove(codesSize - 1);
+            final int lastPos = mTypedWord.length() - 1;
+            char last = mTypedWord.charAt(lastPos);
+            mTypedWord.deleteCharAt(lastPos);
+            if (Character.isUpperCase(last)) mCapsCount--;
+        }
     }
 
     /**
@@ -124,30 +135,29 @@ public class WordComposer {
         if (wordSize == 0) {
             return null;
         }
-//        StringBuffer sb = new StringBuffer(wordSize);
-//        for (int i = 0; i < wordSize; i++) {
-//            char c = (char) mCodes.get(i)[0];
-//            if (i == 0 && mIsCapitalized) {
-//                c = Character.toUpperCase(c);
-//            }
-//            sb.append(c);
-//        }
-//        return sb;
         return mTypedWord;
     }
 
-    public void setCapitalized(boolean capitalized) {
-        mIsCapitalized = capitalized;
+    public void setFirstCharCapitalized(boolean capitalized) {
+        mIsFirstCharCapitalized = capitalized;
     }
     
     /**
      * Whether or not the user typed a capital letter as the first letter in the word
      * @return capitalization preference
      */
-    public boolean isCapitalized() {
-        return mIsCapitalized;
+    public boolean isFirstCharCapitalized() {
+        return mIsFirstCharCapitalized;
     }
-    
+
+    /**
+     * Whether or not all of the user typed chars are upper case
+     * @return true if all user typed chars are upper case, false otherwise
+     */
+    public boolean isAllUpperCase() {
+        return (mCapsCount > 0) && (mCapsCount == size());
+    }
+
     /**
      * Stores the user's selected word, before it is actually committed to the text field.
      * @param preferred

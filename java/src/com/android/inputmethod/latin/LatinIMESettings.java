@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2008-2009 Google Inc.
- *
+ * Copyright (C) 2008 The Android Open Source Project
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
@@ -27,10 +27,8 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
-import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceGroup;
-import android.preference.Preference.OnPreferenceClickListener;
 import android.speech.SpeechRecognizer;
 import android.text.AutoText;
 import android.util.Log;
@@ -43,11 +41,9 @@ public class LatinIMESettings extends PreferenceActivity
         DialogInterface.OnDismissListener {
 
     private static final String QUICK_FIXES_KEY = "quick_fixes";
-    private static final String SHOW_SUGGESTIONS_KEY = "show_suggestions";
     private static final String PREDICTION_SETTINGS_KEY = "prediction_settings";
     private static final String VOICE_SETTINGS_KEY = "voice_mode";
-    private static final String VOICE_ON_PRIMARY_KEY = "voice_on_main";
-    private static final String VOICE_SERVER_KEY = "voice_server_url";
+    /* package */ static final String PREF_SETTINGS_KEY = "settings_key";
 
     private static final String TAG = "LatinIMESettings";
 
@@ -55,8 +51,8 @@ public class LatinIMESettings extends PreferenceActivity
     private static final int VOICE_INPUT_CONFIRM_DIALOG = 0;
 
     private CheckBoxPreference mQuickFixes;
-    private CheckBoxPreference mShowSuggestions;
     private ListPreference mVoicePreference;
+    private ListPreference mSettingsKeyPreference;
     private boolean mVoiceOn;
 
     private VoiceInputLogger mLogger;
@@ -69,8 +65,8 @@ public class LatinIMESettings extends PreferenceActivity
         super.onCreate(icicle);
         addPreferencesFromResource(R.xml.prefs);
         mQuickFixes = (CheckBoxPreference) findPreference(QUICK_FIXES_KEY);
-        mShowSuggestions = (CheckBoxPreference) findPreference(SHOW_SUGGESTIONS_KEY);
         mVoicePreference = (ListPreference) findPreference(VOICE_SETTINGS_KEY);
+        mSettingsKeyPreference = (ListPreference) findPreference(PREF_SETTINGS_KEY);
         SharedPreferences prefs = getPreferenceManager().getSharedPreferences();
         prefs.registerOnSharedPreferenceChangeListener(this);
 
@@ -93,6 +89,7 @@ public class LatinIMESettings extends PreferenceActivity
         } else {
             updateVoiceModeSummary();
         }
+        updateSettingsKeySummary();
     }
 
     @Override
@@ -106,13 +103,20 @@ public class LatinIMESettings extends PreferenceActivity
         (new BackupManager(this)).dataChanged();
         // If turning on voice input, show dialog
         if (key.equals(VOICE_SETTINGS_KEY) && !mVoiceOn) {
-            if (! prefs.getString(VOICE_SETTINGS_KEY, mVoiceModeOff)
+            if (!prefs.getString(VOICE_SETTINGS_KEY, mVoiceModeOff)
                     .equals(mVoiceModeOff)) {
                 showVoiceConfirmation();
             }
         }
         mVoiceOn = !(prefs.getString(VOICE_SETTINGS_KEY, mVoiceModeOff).equals(mVoiceModeOff));
         updateVoiceModeSummary();
+        updateSettingsKeySummary();
+    }
+
+    private void updateSettingsKeySummary() {
+        mSettingsKeyPreference.setSummary(
+                getResources().getStringArray(R.array.settings_key_modes)
+                [mSettingsKeyPreference.findIndexOfValue(mSettingsKeyPreference.getValue())]);
     }
 
     private void showVoiceConfirmation() {

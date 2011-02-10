@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2009 Google Inc.
+ * Copyright (C) 2008 The Android Open Source Project
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -16,20 +16,14 @@
 
 package com.android.inputmethod.latin;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Paint.Align;
 import android.graphics.Rect;
 import android.graphics.Typeface;
-import android.graphics.Paint.Align;
 import android.graphics.drawable.Drawable;
-import android.os.Handler;
-import android.os.Message;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.Gravity;
@@ -40,77 +34,59 @@ import android.view.ViewGroup.LayoutParams;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class CandidateView extends View {
 
-    private static final int OUT_OF_BOUNDS = -1;
-    private static final List<CharSequence> EMPTY_LIST = new ArrayList<CharSequence>();
+    private static final int OUT_OF_BOUNDS_WORD_INDEX = -1;
+    private static final int OUT_OF_BOUNDS_X_COORD = -1;
 
     private LatinIME mService;
-    private List<CharSequence> mSuggestions = EMPTY_LIST;
+    private final ArrayList<CharSequence> mSuggestions = new ArrayList<CharSequence>();
     private boolean mShowingCompletions;
     private CharSequence mSelectedString;
     private int mSelectedIndex;
-    private int mTouchX = OUT_OF_BOUNDS;
-    private Drawable mSelectionHighlight;
+    private int mTouchX = OUT_OF_BOUNDS_X_COORD;
+    private final Drawable mSelectionHighlight;
     private boolean mTypedWordValid;
     
     private boolean mHaveMinimalSuggestion;
     
     private Rect mBgPadding;
 
-    private TextView mPreviewText;
-    private PopupWindow mPreviewPopup;
+    private final TextView mPreviewText;
+    private final PopupWindow mPreviewPopup;
     private int mCurrentWordIndex;
     private Drawable mDivider;
     
     private static final int MAX_SUGGESTIONS = 32;
     private static final int SCROLL_PIXELS = 20;
     
-    private static final int MSG_REMOVE_PREVIEW = 1;
-    private static final int MSG_REMOVE_THROUGH_PREVIEW = 2;
-    
-    private int[] mWordWidth = new int[MAX_SUGGESTIONS];
-    private int[] mWordX = new int[MAX_SUGGESTIONS];
+    private final int[] mWordWidth = new int[MAX_SUGGESTIONS];
+    private final int[] mWordX = new int[MAX_SUGGESTIONS];
     private int mPopupPreviewX;
     private int mPopupPreviewY;
 
     private static final int X_GAP = 10;
     
-    private int mColorNormal;
-    private int mColorRecommended;
-    private int mColorOther;
-    private Paint mPaint;
-    private int mDescent;
+    private final int mColorNormal;
+    private final int mColorRecommended;
+    private final int mColorOther;
+    private final Paint mPaint;
+    private final int mDescent;
     private boolean mScrolled;
     private boolean mShowingAddToDictionary;
-    private CharSequence mWordToAddToDictionary;
     private CharSequence mAddToDictionaryHint;
 
     private int mTargetScrollX;
 
-    private int mMinTouchableWidth;
+    private final int mMinTouchableWidth;
 
     private int mTotalWidth;
     
-    private GestureDetector mGestureDetector;
-
-    Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case MSG_REMOVE_PREVIEW:
-                    mPreviewText.setVisibility(GONE);
-                    break;
-                case MSG_REMOVE_THROUGH_PREVIEW:
-                    mPreviewText.setVisibility(GONE);
-                    if (mTouchX != OUT_OF_BOUNDS) {
-                        removeHighlight();
-                    }
-                    break;
-            }
-            
-        }
-    };
+    private final GestureDetector mGestureDetector;
 
     /**
      * Construct a CandidateView for showing suggested words for completion.
@@ -131,6 +107,7 @@ public class CandidateView extends View {
         mPreviewPopup.setWindowLayoutMode(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
         mPreviewPopup.setContentView(mPreviewText);
         mPreviewPopup.setBackgroundDrawable(null);
+        mPreviewPopup.setAnimationStyle(R.style.KeyPreviewAnimation);
         mColorNormal = res.getColor(R.color.candidate_normal);
         mColorRecommended = res.getColor(R.color.candidate_recommended);
         mColorOther = res.getColor(R.color.candidate_other);
@@ -144,46 +121,71 @@ public class CandidateView extends View {
         mPaint.setStrokeWidth(0);
         mPaint.setTextAlign(Align.CENTER);
         mDescent = (int) mPaint.descent();
-        // 80 pixels for a 160dpi device would mean half an inch
-        mMinTouchableWidth = (int) (getResources().getDisplayMetrics().density * 50);
+        mMinTouchableWidth = (int)res.getDimension(R.dimen.candidate_min_touchable_width);
         
-        mGestureDetector = new GestureDetector(new GestureDetector.SimpleOnGestureListener() {
-            @Override
-            public void onLongPress(MotionEvent me) {
-                if (mSuggestions.size() > 0) {
-                    if (me.getX() + getScrollX() < mWordWidth[0] && getScrollX() < 10) {
-                        longPressFirstWord();
-                    }
-                }
-            }
-            
-            @Override
-            public boolean onScroll(MotionEvent e1, MotionEvent e2,
-                    float distanceX, float distanceY) {
-                final int width = getWidth();
-                mScrolled = true;
-                int scrollX = getScrollX();
-                scrollX += (int) distanceX;
-                if (scrollX < 0) {
-                    scrollX = 0;
-                }
-                if (distanceX > 0 && scrollX + width > mTotalWidth) {                    
-                    scrollX -= (int) distanceX;
-                }
-                mTargetScrollX = scrollX;
-                scrollTo(scrollX, getScrollY());
-                hidePreview();
-                invalidate();
-                return true;
-            }
-        });
-        setHorizontalFadingEdgeEnabled(true);
+        mGestureDetector = new GestureDetector(
+                new CandidateStripGestureListener(mMinTouchableWidth));
         setWillNotDraw(false);
         setHorizontalScrollBarEnabled(false);
         setVerticalScrollBarEnabled(false);
         scrollTo(0, getScrollY());
     }
-    
+
+    private class CandidateStripGestureListener extends GestureDetector.SimpleOnGestureListener {
+        private final int mTouchSlopSquare;
+
+        public CandidateStripGestureListener(int touchSlop) {
+            // Slightly reluctant to scroll to be able to easily choose the suggestion
+            mTouchSlopSquare = touchSlop * touchSlop;
+        }
+
+        @Override
+        public void onLongPress(MotionEvent me) {
+            if (mSuggestions.size() > 0) {
+                if (me.getX() + getScrollX() < mWordWidth[0] && getScrollX() < 10) {
+                    longPressFirstWord();
+                }
+            }
+        }
+
+        @Override
+        public boolean onDown(MotionEvent e) {
+            mScrolled = false;
+            return false;
+        }
+
+        @Override
+        public boolean onScroll(MotionEvent e1, MotionEvent e2,
+                float distanceX, float distanceY) {
+            if (!mScrolled) {
+                // This is applied only when we recognize that scrolling is starting.
+                final int deltaX = (int) (e2.getX() - e1.getX());
+                final int deltaY = (int) (e2.getY() - e1.getY());
+                final int distance = (deltaX * deltaX) + (deltaY * deltaY);
+                if (distance < mTouchSlopSquare) {
+                    return true;
+                }
+                mScrolled = true;
+            }
+
+            final int width = getWidth();
+            mScrolled = true;
+            int scrollX = getScrollX();
+            scrollX += (int) distanceX;
+            if (scrollX < 0) {
+                scrollX = 0;
+            }
+            if (distanceX > 0 && scrollX + width > mTotalWidth) {
+                scrollX -= (int) distanceX;
+            }
+            mTargetScrollX = scrollX;
+            scrollTo(scrollX, getScrollY());
+            hidePreview();
+            invalidate();
+            return true;
+        }
+    }
+
     /**
      * A connection back to the service to communicate with the text field
      * @param listener
@@ -207,7 +209,6 @@ public class CandidateView extends View {
             super.onDraw(canvas);
         }
         mTotalWidth = 0;
-        if (mSuggestions == null) return;
         
         final int height = getHeight();
         if (mBgPadding == null) {
@@ -218,9 +219,8 @@ public class CandidateView extends View {
             mDivider.setBounds(0, 0, mDivider.getIntrinsicWidth(),
                     mDivider.getIntrinsicHeight());
         }
-        int x = 0;
-        final int count = mSuggestions.size(); 
-        final int width = getWidth();
+
+        final int count = mSuggestions.size();
         final Rect bgPadding = mBgPadding;
         final Paint paint = mPaint;
         final int touchX = mTouchX;
@@ -229,43 +229,48 @@ public class CandidateView extends View {
         final boolean typedWordValid = mTypedWordValid;
         final int y = (int) (height + mPaint.getTextSize() - mDescent) / 2;
 
+        boolean existsAutoCompletion = false;
+
+        int x = 0;
         for (int i = 0; i < count; i++) {
             CharSequence suggestion = mSuggestions.get(i);
             if (suggestion == null) continue;
+            final int wordLength = suggestion.length();
+
             paint.setColor(mColorNormal);
             if (mHaveMinimalSuggestion 
                     && ((i == 1 && !typedWordValid) || (i == 0 && typedWordValid))) {
                 paint.setTypeface(Typeface.DEFAULT_BOLD);
                 paint.setColor(mColorRecommended);
-            } else if (i != 0) {
+                existsAutoCompletion = true;
+            } else if (i != 0 || (wordLength == 1 && count > 1)) {
+                // HACK: even if i == 0, we use mColorOther when this suggestion's length is 1 and
+                // there are multiple suggestions, such as the default punctuation list.
                 paint.setColor(mColorOther);
             }
-            final int wordWidth;
-            if (mWordWidth[i] != 0) {
-                wordWidth = mWordWidth[i];
-            } else {
-                float textWidth =  paint.measureText(suggestion, 0, suggestion.length());
+            int wordWidth;
+            if ((wordWidth = mWordWidth[i]) == 0) {
+                float textWidth =  paint.measureText(suggestion, 0, wordLength);
                 wordWidth = Math.max(mMinTouchableWidth, (int) textWidth + X_GAP * 2);
                 mWordWidth[i] = wordWidth;
             }
 
             mWordX[i] = x;
 
-            if (touchX + scrollX >= x && touchX + scrollX < x + wordWidth && !scrolled &&
-                    touchX != OUT_OF_BOUNDS) {
+            if (touchX != OUT_OF_BOUNDS_X_COORD && !scrolled
+                    && touchX + scrollX >= x && touchX + scrollX < x + wordWidth) {
                 if (canvas != null && !mShowingAddToDictionary) {
                     canvas.translate(x, 0);
                     mSelectionHighlight.setBounds(0, bgPadding.top, wordWidth, height);
                     mSelectionHighlight.draw(canvas);
                     canvas.translate(-x, 0);
-                    showPreview(i, null);
                 }
                 mSelectedString = suggestion;
                 mSelectedIndex = i;
             }
 
             if (canvas != null) {
-                canvas.drawText(suggestion, 0, suggestion.length(), x + wordWidth / 2, y, paint);
+                canvas.drawText(suggestion, 0, wordLength, x + wordWidth / 2, y, paint);
                 paint.setColor(mColorOther);
                 canvas.translate(x + wordWidth, 0);
                 // Draw a divider unless it's after the hint
@@ -277,6 +282,7 @@ public class CandidateView extends View {
             paint.setTypeface(Typeface.DEFAULT);
             x += wordWidth;
         }
+        mService.onAutoCompletionStateChanged(existsAutoCompletion);
         mTotalWidth = x;
         if (mTargetScrollX != scrollX) {
             scrollToTarget();
@@ -311,7 +317,12 @@ public class CandidateView extends View {
             boolean typedWordValid, boolean haveMinimalSuggestion) {
         clear();
         if (suggestions != null) {
-            mSuggestions = new ArrayList<CharSequence>(suggestions);
+            int insertCount = Math.min(suggestions.size(), MAX_SUGGESTIONS);
+            for (CharSequence suggestion : suggestions) {
+                mSuggestions.add(suggestion);
+                if (--insertCount == 0)
+                    break;
+            }
         }
         mShowingCompletions = completions;
         mTypedWordValid = typedWordValid;
@@ -324,8 +335,11 @@ public class CandidateView extends View {
         requestLayout();
     }
 
+    public boolean isShowingAddToDictionaryHint() {
+        return mShowingAddToDictionary;
+    }
+
     public void showAddToDictionaryHint(CharSequence word) {
-        mWordToAddToDictionary = word;
         ArrayList<CharSequence> suggestions = new ArrayList<CharSequence>();
         suggestions.add(word);
         suggestions.add(mAddToDictionaryHint);
@@ -339,62 +353,21 @@ public class CandidateView extends View {
         return true;
     }
 
-    public void scrollPrev() {
-        int i = 0;
-        final int count = mSuggestions.size();
-        int firstItem = 0; // Actually just before the first item, if at the boundary
-        while (i < count) {
-            if (mWordX[i] < getScrollX() 
-                    && mWordX[i] + mWordWidth[i] >= getScrollX() - 1) {
-                firstItem = i;
-                break;
-            }
-            i++;
-        }
-        int leftEdge = mWordX[firstItem] + mWordWidth[firstItem] - getWidth();
-        if (leftEdge < 0) leftEdge = 0;
-        updateScrollPosition(leftEdge);
-    }
-    
-    public void scrollNext() {
-        int i = 0;
-        int scrollX = getScrollX();
-        int targetX = scrollX;
-        final int count = mSuggestions.size();
-        int rightEdge = scrollX + getWidth();
-        while (i < count) {
-            if (mWordX[i] <= rightEdge &&
-                    mWordX[i] + mWordWidth[i] >= rightEdge) {
-                targetX = Math.min(mWordX[i], mTotalWidth - getWidth());
-                break;
-            }
-            i++;
-        }
-        updateScrollPosition(targetX);
+    /* package */ List<CharSequence> getSuggestions() {
+        return mSuggestions;
     }
 
-    private void updateScrollPosition(int targetX) {
-        if (targetX != getScrollX()) {
-            // TODO: Animate
-            mTargetScrollX = targetX;
-            requestLayout();
-            invalidate();
-            mScrolled = true;
-        }
-    }
-    
     public void clear() {
-        mSuggestions = EMPTY_LIST;
-        mTouchX = OUT_OF_BOUNDS;
+        // Don't call mSuggestions.clear() because it's being used for logging
+        // in LatinIME.pickSuggestionManually().
+        mSuggestions.clear();
+        mTouchX = OUT_OF_BOUNDS_X_COORD;
         mSelectedString = null;
         mSelectedIndex = -1;
         mShowingAddToDictionary = false;
         invalidate();
         Arrays.fill(mWordWidth, 0);
         Arrays.fill(mWordX, 0);
-        if (mPreviewPopup.isShowing()) {
-            mPreviewPopup.dismiss();
-        }
     }
     
     @Override
@@ -411,14 +384,17 @@ public class CandidateView extends View {
 
         switch (action) {
         case MotionEvent.ACTION_DOWN:
-            mScrolled = false;
             invalidate();
             break;
         case MotionEvent.ACTION_MOVE:
             if (y <= 0) {
                 // Fling up!?
                 if (mSelectedString != null) {
+                    // If there are completions from the application, we don't change the state to
+                    // STATE_PICKED_SUGGESTION
                     if (!mShowingCompletions) {
+                        // This "acceptedSuggestion" will not be counted as a word because
+                        // it will be counted in pickSuggestion instead.
                         TextEntryState.acceptedSuggestion(mSuggestions.get(0),
                                 mSelectedString);
                     }
@@ -427,7 +403,6 @@ public class CandidateView extends View {
                     mSelectedIndex = -1;
                 }
             }
-            invalidate();
             break;
         case MotionEvent.ACTION_UP:
             if (!mScrolled) {
@@ -446,39 +421,18 @@ public class CandidateView extends View {
             }
             mSelectedString = null;
             mSelectedIndex = -1;
-            removeHighlight();
-            hidePreview();
             requestLayout();
+            hidePreview();
+            invalidate();
             break;
         }
         return true;
     }
-    
-    /**
-     * For flick through from keyboard, call this method with the x coordinate of the flick 
-     * gesture.
-     * @param x
-     */
-    public void takeSuggestionAt(float x) {
-        mTouchX = (int) x;
-        // To detect candidate
-        onDraw(null);
-        if (mSelectedString != null) {
-            if (!mShowingCompletions) {
-                TextEntryState.acceptedSuggestion(mSuggestions.get(0), mSelectedString);
-            }
-            mService.pickSuggestionManually(mSelectedIndex, mSelectedString);
-        }
-        invalidate();
-        mHandler.sendMessageDelayed(mHandler.obtainMessage(MSG_REMOVE_THROUGH_PREVIEW), 200);
-    }
 
     private void hidePreview() {
-        mCurrentWordIndex = OUT_OF_BOUNDS;
-        if (mPreviewPopup.isShowing()) {
-            mHandler.sendMessageDelayed(mHandler
-                    .obtainMessage(MSG_REMOVE_PREVIEW), 60);
-        }
+        mTouchX = OUT_OF_BOUNDS_X_COORD;
+        mCurrentWordIndex = OUT_OF_BOUNDS_WORD_INDEX;
+        mPreviewPopup.dismiss();
     }
     
     private void showPreview(int wordIndex, String altText) {
@@ -486,7 +440,7 @@ public class CandidateView extends View {
         mCurrentWordIndex = wordIndex;
         // If index changed or changing text
         if (oldWordIndex != mCurrentWordIndex || altText != null) {
-            if (wordIndex == OUT_OF_BOUNDS) {
+            if (wordIndex == OUT_OF_BOUNDS_WORD_INDEX) {
                 hidePreview();
             } else {
                 CharSequence word = altText != null? altText : mSuggestions.get(wordIndex);
@@ -501,7 +455,6 @@ public class CandidateView extends View {
                 mPopupPreviewX = mWordX[wordIndex] - mPreviewText.getPaddingLeft() - getScrollX()
                         + (mWordWidth[wordIndex] - wordWidth) / 2;
                 mPopupPreviewY = - popupHeight;
-                mHandler.removeMessages(MSG_REMOVE_PREVIEW);
                 int [] offsetInWindow = new int[2];
                 getLocationInWindow(offsetInWindow);
                 if (mPreviewPopup.isShowing()) {
@@ -517,12 +470,7 @@ public class CandidateView extends View {
             }
         }
     }
-    
-    private void removeHighlight() {
-        mTouchX = OUT_OF_BOUNDS;
-        invalidate();
-    }
-    
+
     private void longPressFirstWord() {
         CharSequence word = mSuggestions.get(0);
         if (word.length() < 2) return;

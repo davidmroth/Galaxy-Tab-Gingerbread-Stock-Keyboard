@@ -38,7 +38,7 @@ public class UserDictionary extends ExpandableDictionary {
     private String mLocale;
 
     public UserDictionary(Context context, String locale) {
-        super(context);
+        super(context, Suggest.DIC_USER);
         mLocale = locale;
         // Perform a managed query. The Activity will handle closing and requerying the cursor
         // when needed.
@@ -54,6 +54,7 @@ public class UserDictionary extends ExpandableDictionary {
         loadDictionary();
     }
 
+    @Override
     public synchronized void close() {
         if (mObserver != null) {
             getContext().getContentResolver().unregisterContentObserver(mObserver);
@@ -88,13 +89,19 @@ public class UserDictionary extends ExpandableDictionary {
         super.addWord(word, frequency);
 
         // Update the user dictionary provider
-        ContentValues values = new ContentValues(5);
+        final ContentValues values = new ContentValues(5);
         values.put(Words.WORD, word);
         values.put(Words.FREQUENCY, frequency);
         values.put(Words.LOCALE, mLocale);
         values.put(Words.APP_ID, 0);
 
-        getContext().getContentResolver().insert(Words.CONTENT_URI, values);
+        final ContentResolver contentResolver = getContext().getContentResolver();
+        new Thread("addWord") {
+            public void run() {
+                contentResolver.insert(Words.CONTENT_URI, values);
+            }
+        }.start();
+
         // In case the above does a synchronous callback of the change observer
         setRequiresReload(false);
     }

@@ -22,8 +22,10 @@
     xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="english_ime_name" msgid="7252517407088836577">"Android-Tastatur"</string>
     <string name="english_ime_settings" msgid="6661589557206947774">"Android-Tastatureinstellungen"</string>
+    <string name="english_ime_input_options" msgid="3909945612939668554">"Eingabeoptionen"</string>
     <string name="vibrate_on_keypress" msgid="5258079494276955460">"Vibrieren b. Tastendruck"</string>
     <string name="sound_on_keypress" msgid="6093592297198243644">"Ton bei Tastendruck"</string>
+    <string name="popup_on_keypress" msgid="123894815723512944">"Pop-up bei Tastendruck"</string>
     <string name="hit_correction" msgid="4855351009261318389">"Eingabefehler korrigieren"</string>
     <string name="hit_correction_summary" msgid="8761701873008070796">"Korrektur von Eingabefehlern aktivieren"</string>
     <string name="hit_correction_land" msgid="2567691684825205448">"Eingabefehler im Querformat"</string>
@@ -39,29 +41,28 @@
     <string name="auto_cap" msgid="1719746674854628252">"Autom. Groß-/Kleinschr."</string>
     <string name="auto_cap_summary" msgid="3260681697600786825">"Sätze mit Großbuchstaben beginnen"</string>
     <string name="auto_punctuate" msgid="7276672334264521751">"Autom. Zeichensetzung"</string>
-    <!-- no translation found for auto_punctuate_summary (6589441565817502132) -->
-    <skip />
+    <string name="auto_punctuate_summary" msgid="6589441565817502132"></string>
     <string name="quick_fixes" msgid="5353213327680897927">"Quick Fixes"</string>
     <string name="quick_fixes_summary" msgid="3405028402510332373">"Korrigiert gängige Tippfehler"</string>
     <string name="show_suggestions" msgid="507074425254289133">"Vorschläge anzeigen"</string>
     <string name="show_suggestions_summary" msgid="1989672863935759654">"Vorgeschlagene Wörter während des Tippens anzeigen"</string>
     <string name="auto_complete" msgid="1103196318775486023">"Autom. vervollständigen"</string>
     <string name="auto_complete_summary" msgid="6113149638718274624">"Leertaste und Interpunktion fügen autom. ein markiertes Wort ein"</string>
+    <string name="prefs_settings_key" msgid="4623341240804046498">"Einstellungstaste anz."</string>
+    <string name="settings_key_mode_auto_name" msgid="2993460277873684680">"Automatisch"</string>
+    <string name="settings_key_mode_always_show_name" msgid="3047567041784760575">"Immer anzeigen"</string>
+    <string name="settings_key_mode_always_hide_name" msgid="7833948046716923994">"Immer ausblenden"</string>
+    <!-- no translation found for settings_key_modes:0 (8549888726962891527) -->
+    <!-- no translation found for settings_key_modes:1 (881280041213210923) -->
+    <!-- no translation found for settings_key_modes:2 (7317310620171067848) -->
+    <string name="bigram_suggestion" msgid="1323347224043514969">"Bigramm-Vorschläge"</string>
+    <string name="bigram_suggestion_summary" msgid="4383845146070101531">"Zur Verbesserung des Vorschlags vorheriges Wort verwenden"</string>
   <string-array name="prediction_modes">
     <item msgid="4870266572388153286">"Kein"</item>
     <item msgid="1669461741568287396">"Standard"</item>
     <item msgid="4894328801530136615">"Erweitert"</item>
   </string-array>
     <string name="added_word" msgid="8993883354622484372">"<xliff:g id="WORD">%s</xliff:g>: gespeichert"</string>
-    <string name="alternates_for_a" msgid="2566516493365324765">"ä"</string>
-    <string name="alternates_for_e" msgid="3900510936875547555">"èéêë"</string>
-    <string name="alternates_for_i" msgid="7097915268629342242">"ìíîï"</string>
-    <string name="alternates_for_o" msgid="6151402748321267776">"ö"</string>
-    <string name="alternates_for_u" msgid="5899096818189442934">"ùúûü"</string>
-    <string name="alternates_for_s" msgid="348762530927662188">"§ß"</string>
-    <string name="alternates_for_n" msgid="6257322556221886400">"ñ"</string>
-    <string name="alternates_for_c" msgid="151699780720639892">"ç"</string>
-    <string name="alternates_for_y" msgid="1722776806607271199">"ýÿ"</string>
     <string name="tip_long_press" msgid="6101270866284343344">"Zur Anzeige von Umlauten (ä, ö usw.) Taste gedrückt halten"</string>
     <string name="tip_dismiss" msgid="7585579046862204381">"Zum Schließen der Tastatur ↶ drücken"</string>
     <string name="tip_access_symbols" msgid="6344098517525531652">"Auf Zahlen und Symbole zugreifen"</string>
@@ -89,15 +90,14 @@
     <string name="voice_hint_dialog_message" msgid="6892342981545727994">"Um die Spracheingabe zu verwenden, drücken Sie die Mikrofontaste oder ziehen Sie Ihren Finger über die Bildschirmtastatur."</string>
     <string name="voice_listening" msgid="467518160751321844">"Jetzt sprechen"</string>
     <string name="voice_working" msgid="6666937792815731889">"Vorgang läuft"</string>
-    <!-- no translation found for voice_initializing (661962047129906646) -->
-    <skip />
+    <string name="voice_initializing" msgid="661962047129906646"></string>
     <string name="voice_error" msgid="5140896300312186162">"Fehler. Versuchen Sie es erneut.."</string>
     <string name="voice_network_error" msgid="6649556447401862563">"Keine Verbindung"</string>
     <string name="voice_too_much_speech" msgid="5746973620134227376">"Fehler – Text zu lang"</string>
     <string name="voice_audio_error" msgid="5072707727016414454">"Audio-Problem"</string>
     <string name="voice_server_error" msgid="7807129913977261644">"Serverfehler"</string>
     <string name="voice_speech_timeout" msgid="8461817525075498795">"Keine Sprache zu hören"</string>
-    <string name="voice_no_match" msgid="4285117547030179174">"Keine Übereinstimmungen gefunden"</string>
+    <string name="voice_no_match" msgid="4285117547030179174">"Keine Treffer gefunden"</string>
     <string name="voice_not_installed" msgid="5552450909753842415">"Sprach-Suche nicht installiert"</string>
     <string name="voice_swipe_hint" msgid="6943546180310682021"><b>"Hinweis:"</b>" Ziehen Sie zum Sprechen den Finger über die Tastatur."</string>
     <string name="voice_punctuation_hint" msgid="1611389463237317754"><b>"Hinweis:"</b>" Versuchen Sie beim nächsten Mal, Satzzeichen wie \"Punkt\", \"Komma\" oder \"Fragezeichen\" per Sprachbefehl einzugeben."</string>
@@ -125,9 +125,16 @@
     <string name="popular_domain_2" msgid="3036812463748402878">".org"</string>
     <string name="popular_domain_3" msgid="8718639560809452028">".gov"</string>
     <string name="popular_domain_4" msgid="35359437471311470">".edu"</string>
-    <string name="inputMethod" msgid="7854532062009028116">"Eingabemethode"</string>
+    <string name="selectInputMethod" msgid="315076553378705821">"Eingabemethode auswählen"</string>
     <string name="language_selection_title" msgid="1651299598555326750">"Eingabesprachen"</string>
     <string name="language_selection_summary" msgid="187110938289512256">"Finger über die Leertaste bewegen, um die Eingabesprache zu wechseln"</string>
-    <string name="hint_add_to_dictionary" msgid="8058519710062071085">"← Zum Speichern erneut tippen"</string>
+    <string name="hint_add_to_dictionary" msgid="9006292060636342317">"← Zum Speichern erneut berühren"</string>
     <string name="has_dictionary" msgid="6071847973466625007">"Wörterbuch verfügbar"</string>
+    <string name="prefs_enable_log" msgid="6620424505072963557">"Nutzer-Feedback aktivieren"</string>
+    <string name="prefs_description_log" msgid="5827825607258246003">"Tragen Sie zur Verbesserung dieses Eingabemethodeneditors bei, indem Sie automatisch Nutzungsstatistiken und Absturzberichte an Google senden."</string>
+    <string name="prefs_enable_recorrection" msgid="4588408906649533582">"Wortkorrektur"</string>
+    <!-- outdated translation 5037231665897435902 -->     <string name="prefs_enable_recorrection_summary" msgid="1056068922330206170">"Sie können Wörter korrigieren, indem Sie die eingegebenen Wörter berühren."</string>
+    <string name="keyboard_layout" msgid="437433231038683666">"Tastaturdesign"</string>
+    <string name="subtype_mode_keyboard" msgid="2242090416595003881">"Tastatur"</string>
+    <string name="subtype_mode_voice" msgid="4394113125441627771">"Sprache"</string>
 </resources>

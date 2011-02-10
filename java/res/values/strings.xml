@@ -22,12 +22,18 @@
     <string name="english_ime_name">Android keyboard</string>
     <!-- Title for Latin keyboard settings activity / dialog -->
     <string name="english_ime_settings">Android keyboard settings</string>
+    <!-- Title for Latin keyboard input options dialog -->
+    <string name="english_ime_input_options">Input options</string>
 
     <!-- Option to provide vibrate/haptic feedback on keypress -->
     <string name="vibrate_on_keypress">Vibrate on keypress</string>
+
     <!-- Option to play back sound on keypress in soft keyboard -->
     <string name="sound_on_keypress">Sound on keypress</string>
-    
+
+    <!-- Option to pop up the character with a larger font above soft keyboard -->
+    <string name="popup_on_keypress">Popup on keypress</string>
+
     <!-- Option to enable using nearby keys when correcting/predicting -->
     <string name="hit_correction">Correct typing errors</string>
     
@@ -85,6 +91,32 @@
     <!-- Description for auto completion -->
     <string name="auto_complete_summary">Spacebar and punctuation automatically insert highlighted word</string>
     
+    <!-- Option to show/hide the settings key -->
+    <string name="prefs_settings_key">Show settings key</string>
+    <!-- Array of the settings key mode values -->
+    <string-array name="settings_key_modes_values" translatable="false">
+        <item>@string/settings_key_mode_auto</item>
+        <item>@string/settings_key_mode_always_show</item>
+        <item>@string/settings_key_mode_always_hide</item>
+    </string-array>
+    <!-- Option to automatically decide to show/hide the settings key -->
+    <string name="settings_key_mode_auto_name">Automatic</string>
+    <!-- Option to always show the settings key -->
+    <string name="settings_key_mode_always_show_name">Always show</string>
+    <!-- Option to always hide the settings key -->
+    <string name="settings_key_mode_always_hide_name">Always hide</string>
+    <!-- Array of the settings key modes -->
+    <string-array name="settings_key_modes">
+        <item>@string/settings_key_mode_auto_name</item>
+        <item>@string/settings_key_mode_always_show_name</item>
+        <item>@string/settings_key_mode_always_hide_name</item>
+    </string-array>
+
+    <!-- Option to enable bigram completion -->
+    <string name="bigram_suggestion">Bigram Suggestions</string>
+    <!-- Description for auto completion -->
+    <string name="bigram_suggestion_summary">Use previous word to improve suggestion</string>
+
     <!-- Array of prediction modes -->
     <string-array name="prediction_modes">
         <item>None</item>
@@ -107,24 +139,6 @@
 
     <!-- Indicates that a word has been added to the dictionary -->
     <string name="added_word"><xliff:g id="word">%s</xliff:g> : Saved</string>
-    <!-- Accented forms of "a" -->
-    <string name="alternates_for_a">àáâãäåæ</string>
-    <!-- Accented forms of "e" -->
-    <string name="alternates_for_e">èéêë</string>
-    <!-- Accented forms of "i" -->
-    <string name="alternates_for_i">ìíîï</string>
-    <!-- Accented forms of "o" -->
-    <string name="alternates_for_o">òóôõöœø</string>
-    <!-- Accented forms of "u" -->
-    <string name="alternates_for_u">ùúûü</string>
-    <!-- Letters associated with "s" -->
-    <string name="alternates_for_s">§ß</string>
-    <!-- Accented forms of "n" -->
-    <string name="alternates_for_n">ñ</string>
-    <!-- Accented forms of "c" -->
-    <string name="alternates_for_c">ç</string>
-    <!-- Accented forms of "y" -->
-    <string name="alternates_for_y">ýÿ</string>
     
     <!-- Tip to long press on keys -->
     <string name="tip_long_press">Hold a key down to see accents (ø, ö, etc.)</string>
@@ -309,17 +323,57 @@
     <!-- popular web domains for the locale - item 4, displayed in the popup -->
     <string name="popular_domain_4">".edu"</string>
 
-    <!-- Menu item for launching Input method switcher -->
-    <string name="inputMethod">Input method</string>
-    
+    <!-- Menu item for launching Input method picker -->
+    <string name="selectInputMethod">Select input method</string>
+
     <!-- Title for input language selection screen -->
     <string name="language_selection_title">Input languages</string>
     <!-- Title summary for input language selection screen -->
     <string name="language_selection_summary">Slide finger on spacebar to change language</string>
     
     <!-- Add to dictionary hint -->
-    <string name="hint_add_to_dictionary">\u2190 Tap again to save</string>
+    <string name="hint_add_to_dictionary">\u2190 Touch again to save</string>
     
     <!-- Inform the user that a particular language has an available dictionary -->
     <string name="has_dictionary">Dictionary available</string>
+
+    <!-- Preferences item for enabling to send user statistics to Google -->
+    <string name="prefs_enable_log">Enable user feedback</string>
+    <!-- Description for enabling to send user statistics to Google -->
+    <string name="prefs_description_log">Help improve this input method editor by automatically sending usage statistics and crash reports to Google.</string>
+    <!-- Preferences item for enabling to correct suggestions by touching words you have typed -->
+    <string name="prefs_enable_recorrection">Touch to correct words</string>
+    <!-- The summary for the preferences item for enabling to correct suggestions by touching words you have typed -->
+    <string name="prefs_enable_recorrection_summary">Touch entered words to correct them</string>
+
+    <!-- Description for keyboard theme switcher -->
+    <string name="keyboard_layout">Keyboard Theme</string>
+    <string name="layout_basic" translatable="false">Basic</string>
+    <string name="layout_high_contrast" translatable="false">Basic (High Contrast)</string>
+    <string name="layout_stone_bold"  translatable="false">Stone (bold)</string>
+    <string name="layout_stone_normal"  translatable="false">Stone (normal)</string>
+    <string name="layout_gingerbread"  translatable="false">Gingerbread</string>
+
+    <string-array name="keyboard_layout_modes" translatable="false">
+        <item>@string/layout_basic</item>
+        <item>@string/layout_high_contrast</item>
+        <item>@string/layout_stone_normal</item>
+        <item>@string/layout_stone_bold</item>
+        <item>@string/layout_gingerbread</item>
+    </string-array>
+
+    <string-array name="keyboard_layout_modes_values" translatable="false">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+    </string-array>
+
+    <string name="subtype_mode_keyboard">keyboard</string>
+    <string name="subtype_mode_voice">voice</string>
+
+    <!-- Title for Latin keyboard debug settings activity / dialog -->
+    <string name="english_ime_debug_settings" translatable="false">Android keyboard Debug settings</string>
+    <string name="prefs_debug_mode" translatable="false">Debug Mode</string>
 </resources>

@@ -36,7 +36,6 @@ public class Hints {
         public void showHint(int viewResource);
     }
 
-    private static final String TAG = "Hints";
     private static final String PREF_VOICE_HINT_NUM_UNIQUE_DAYS_SHOWN =
             "voice_hint_num_unique_days_shown";
     private static final String PREF_VOICE_HINT_LAST_TIME_SHOWN =
@@ -107,7 +106,7 @@ public class Hints {
         SharedPreferences.Editor editor =
                 PreferenceManager.getDefaultSharedPreferences(mContext).edit();
         editor.putLong(PREF_VOICE_INPUT_LAST_TIME_USED, System.currentTimeMillis());
-        editor.commit();
+        SharedPreferencesCompat.apply(editor);
 
         mVoiceResultContainedPunctuation = false;
         for (CharSequence s : SPEAKABLE_PUNCTUATION.keySet()) {
@@ -169,7 +168,7 @@ public class Hints {
             SharedPreferences.Editor editor = sp.edit();
             editor.putInt(PREF_VOICE_HINT_NUM_UNIQUE_DAYS_SHOWN, numUniqueDaysShown + 1);
             editor.putLong(PREF_VOICE_HINT_LAST_TIME_SHOWN, System.currentTimeMillis());
-            editor.commit();
+            SharedPreferencesCompat.apply(editor);
         }
 
         if (mDisplay != null) {
@@ -182,7 +181,7 @@ public class Hints {
         int value = sp.getInt(pref, 0);
         SharedPreferences.Editor editor = sp.edit();
         editor.putInt(pref, value + 1);
-        editor.commit();
+        SharedPreferencesCompat.apply(editor);
         return value;
     }
 }

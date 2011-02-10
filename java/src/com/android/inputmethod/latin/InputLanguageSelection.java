@@ -40,7 +40,7 @@ public class InputLanguageSelection extends PreferenceActivity {
         "ko", "ja", "zh", "el"
     };
 
-    private static class Loc implements Comparable {
+    private static class Loc implements Comparable<Object> {
         static Collator sCollator = Collator.getInstance();
 
         String label;
@@ -99,7 +99,10 @@ public class InputLanguageSelection extends PreferenceActivity {
         boolean haveDictionary = false;
         conf.locale = locale;
         res.updateConfiguration(conf, res.getDisplayMetrics());
-        BinaryDictionary bd = new BinaryDictionary(this, R.raw.main);
+
+        int[] dictionaries = LatinIME.getDictionary(res);
+        BinaryDictionary bd = new BinaryDictionary(this, dictionaries, Suggest.DIC_MAIN);
+
         // Is the dictionary larger than a placeholder? Arbitrarily chose a lower limit of
         // 4000-5000 words, whereas the LARGE_DICTIONARY is about 20000+ words.
         if (bd.getSize() > Suggest.LARGE_DICTIONARY_THRESHOLD / 4) {
@@ -140,7 +143,7 @@ public class InputLanguageSelection extends PreferenceActivity {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
         Editor editor = sp.edit();
         editor.putString(LatinIME.PREF_SELECTED_LANGUAGES, checkedLanguages);
-        editor.commit();
+        SharedPreferencesCompat.apply(editor);
     }
 
     ArrayList<Loc> getUniqueLocales() {
