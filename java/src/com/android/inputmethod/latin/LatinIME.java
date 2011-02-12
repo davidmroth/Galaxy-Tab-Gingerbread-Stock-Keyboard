@@ -2384,9 +2384,10 @@ public class LatinIME extends InputMethodService
             return;
         }
         if (mKeyboardSwitcher.getInputView() != null) {
+            mKeyboardSwitcher.getInputView().setHapticFeedbackEnabled(mVibrateOn);
             mKeyboardSwitcher.getInputView().performHapticFeedback(
-                    HapticFeedbackConstants.KEYBOARD_TAP,
-                    HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING);
+                    HapticFeedbackConstants.FLAG_IGNORE_VIEW_SETTING,
+                    HapticFeedbackConstants.KEYBOARD_TAP);
         }
     }
 
